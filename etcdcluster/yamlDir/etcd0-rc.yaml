@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ReplicationController
+metadata: 
+  name: etcd0
+  labels:
+    name: etcd0
+  namespace: cloudtest
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: etcd0
+    spec:
+      containers:
+      - name: etcd0
+        image: localhub:5000/cloudtest/etcd-amd64:2.2.5
+        args:
+        - /bin/bash
+        - -c
+        - etcd -name etcd0 -data-dir /var/etcd/data -listen-peer-urls http://0.0.0.0:2380 -listen-client-urls http://0.0.0.0:4001 -initial-advertise-peer-urls http://etcd0:2380 -initial-cluster etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380 -initial-cluster-state new -initial-cluster-token etcd-cluster -advertise-client-urls http://etcd0:4001
+        ports:
+        - containerPort: 2380
+	  name: peerPort
+        - containerPort: 4001
+	  name: clientPort
+      restartPolicy: Always
